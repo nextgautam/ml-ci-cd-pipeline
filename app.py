@@ -5,29 +5,30 @@ import joblib
 import numpy as np
 from flask import Flask, request, jsonify
 
-#----Config----
-MODEL_PATH = os.getenve("MODEL_PATH", "model/iris_model.pkl") #adjust filename if needed
+# --- Config ---
+MODEL_PATH = os.getenv("MODEL_PATH", "model/iris_model.pkl")  # adjust filename if needed
 
-#---App---
-app = Flask(_name_)
+# --- App ---
+app = Flask(__name__)
 
-#Load once ata startup
+# Load once at startup
 try:
     model = joblib.load(MODEL_PATH)
 except Exception as e:
-   #fail fast with a helpful message
+    # Fail fast with a helpful message
     raise RuntimeError(f"Could not load model from {MODEL_PATH}: {e}")
 
 @app.get("/health")
 def health():
     return {"status": "ok"}, 200
+
 @app.post("/predict")
 def predict():
     """
     Accepts either:
-    {"input": [[...feature vector...], [...]]}   # 2D list
+    {"input": [[...feature vector...], [...]]}  # 2D list
     or
-    {"input": [...feature vector...]}            # 1D list
+    {"input": [...feature vector...]}           # 1D list
     """
     try:
         payload = request.get_json(force=True)
@@ -46,8 +47,8 @@ def predict():
         return jsonify(prediction=preds), 200
 
     except Exception as e:
-        return jsonify(error=str(e)), 500
+        return jsonify(error=str(e)), 500
 
-if __name__ ==__main__":
-    # Localdev only; Render will run with Gunicorn (see startCommand below)
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",8000)))
+if __name__ == "__main__":
+    # Local dev only; Render will run with Gunicorn (see startCommand below)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))

@@ -1,15 +1,17 @@
-services:
+import unittest
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+import os
 
-  -type:web
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # go one level up
+data_path = os.path.join(BASE_DIR, 'iris_model.pkl')
+model = joblib.load(data_path)
 
-  name:ml-flask-api
+class TestModelTraining(unittest.TestCase):
+    def test_model_training(self):
+        # model = joblib.load('iris_model.pkl')
+        self.assertIsInstance(model, RandomForestClassifier)
+        self.assertGreaterEqual(len(model.feature_importances_), 4)
 
-  env:python
-
-  plan:free
-
-  buildCommand:"pip install -r requirements.txt"
-
-  startCommand:"gunicorn app:app --bind 0.0.0.0:$PORT"
-
-  autoDeploy:false # We'll trigger deploys via GitHub Actions
+if __name__ == '__main__':
+    unittest.main()
